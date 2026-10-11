@@ -130,18 +130,43 @@ export function matchInvite(people, notebooks, min = 0.8) {
   return out.sort((a, b) => b.score - a.score);
 }
 
+// ---------- dates ----------
+export function addMonths(iso, months) {
+  const [y, m, d] = iso.split('-').map(Number);
+  const t = new Date(Date.UTC(y, m - 1 + months, 1));
+  const last = new Date(Date.UTC(t.getUTCFullYear(), t.getUTCMonth() + 1, 0)).getUTCDate();
+  t.setUTCDate(Math.min(d, last));
+  return t.toISOString().slice(0, 10);
+}
+export const addDays = (iso, n) => new Date(Date.parse(iso) + n * 86_400_000).toISOString().slice(0, 10);
+export const daysUntil = (iso, today) => Math.round((Date.parse(iso) - Date.parse(today)) / 86_400_000);
+export const heDate = (iso) => iso.split('-').reverse().join('.');
+
 // ---------- calendar ----------
 const icsText = (v) => String(v).replace(/[\\;,]/g, (m) => '\\' + m).replace(/\n/g, '\\n');
+const compact = (iso) => iso.replace(/-/g, '');
+const hhmm = (t) => t.replace(':', '') + '00';
 
-export function icsEvent({ title, date, description = '', uid = `${Date.now()}@agent100` }) {
-  const d = date.replace(/-/g, '');
-  const next = new Date(Date.parse(date) + 86_400_000).toISOString().slice(0, 10).replace(/-/g, '');
-  return [
-    'BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Agent100//HE', 'CALSCALE:GREGORIAN',
-    'BEGIN:VEVENT', `UID:${uid}`, `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').slice(0, 15)}Z`,
-    `DTSTART;VALUE=DATE:${d}`, `DTEND;VALUE=DATE:${next}`,
-    `SUMMARY:${icsText(title)}`, `DESCRIPTION:${icsText(description)}`,
-    'BEGIN:VALARM', 'TRIGGER:-PT15H', 'ACTION:DISPLAY', `DESCRIPTION:${icsText(title)}`, 'END:VALARM',
-    'END:VEVENT', 'END:VCALENDAR',
-  ].join('\r\n');
+// One VEVENT. All-day (reminder the evening before) or timed in Israel time
+// (start/end "HH:MM"; reminder two hours before).
+function vevent({ title, date, start, end, description = '', location = '', uid }) {
+  const lines = ['BEGIN:VEVENT', `UID:${uid || `${Date.now()}-${Math.random().toString(36).slice(2)}@agent100`}`,
+    `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').slice(0, 15)}Z`];
+  if (start) {
+    const endTime = end || `${String((Number(start.slice(0, 2)) + 1) % 24).padStart(2, '0')}:${start.slice(3)}`;
+    lines.push(`DTSTART;TZID=Asia/Jerusalem:${compact(date)}T${hhmm(start)}`, `DTEND;TZID=Asia/Jerusalem:${compact(date)}T${hhmm(endTime)}`);
+  } else {
+    lines.push(`DTSTART;VALUE=DATE:${compact(date)}`, `DTEND;VALUE=DATE:${compact(addDays(date, 1))}`);
+  }
+  lines.push(`SUMMARY:${icsText(title)}`);
+  if (description) lines.push(`DESCRIPTION:${icsText(description)}`);
+  if (location) lines.push(`LOCATION:${icsText(location)}`);
+  lines.push('BEGIN:VALARM', `TRIGGER:${start ? '-PT2H' : '-PT15H'}`, 'ACTION:DISPLAY', `DESCRIPTION:${icsText(title)}`, 'END:VALARM', 'END:VEVENT');
+  return lines;
 }
+
+export function icsCalendar(events) {
+  return ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Agent100//HE', 'CALSCALE:GREGORIAN', ...events.flatMap(vevent), 'END:VCALENDAR'].join('\r\n');
+}
+
+export const icsEvent = (event) => icsCalendar([event]);

@@ -1,23 +1,69 @@
 {
   "functions": {
-    "api/notebook.js": { "maxDuration": 60 },
-    "api/invite.js": { "maxDuration": 40 }
+    "api/notebook.js": {
+      "maxDuration": 60
+    },
+    "api/invite.js": {
+      "maxDuration": 40
+    },
+    "api/read.js": {
+      "maxDuration": 45
+    }
   },
   "rewrites": [
-    { "source": "/notebook", "destination": "/notebook.html" },
-    { "source": "/invite", "destination": "/invite.html" },
-    { "source": "/privacy", "destination": "/privacy.html" }
+    {
+      "source": "/notebook",
+      "destination": "/notebook.html"
+    },
+    {
+      "source": "/invite",
+      "destination": "/invite.html"
+    },
+    {
+      "source": "/privacy",
+      "destination": "/privacy.html"
+    },
+    {
+      "source": "/bills",
+      "destination": "/bills.html"
+    },
+    {
+      "source": "/appointments",
+      "destination": "/appointments.html"
+    },
+    {
+      "source": "/warranty",
+      "destination": "/warranty.html"
+    }
   ],
   "headers": [
     {
       "source": "/(.*)",
       "headers": [
-        { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'" },
-        { "key": "X-Content-Type-Options", "value": "nosniff" },
-        { "key": "X-Frame-Options", "value": "DENY" },
-        { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
-        { "key": "Permissions-Policy", "value": "camera=(self), microphone=(), geolocation=(), payment=()" },
-        { "key": "Strict-Transport-Security", "value": "max-age=63072000; includeSubDomains" }
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: blob:; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; object-src 'none'"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "Referrer-Policy",
+          "value": "strict-origin-when-cross-origin"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "camera=(self), microphone=(), geolocation=(), payment=()"
+        },
+        {
+          "key": "Strict-Transport-Security",
+          "value": "max-age=63072000; includeSubDomains"
+        }
       ]
     }
   ]
