@@ -1,0 +1,38 @@
+name: agent
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"   # every 15 minutes (GitHub may delay scheduled runs)
+  workflow_dispatch:          # "Run workflow" button for a manual run
+
+permissions:
+  contents: write
+
+concurrency:
+  group: agent
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Do one job
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          INFER_IN: ${{ vars.INFER_IN }}
+          INFER_OUT: ${{ vars.INFER_OUT }}
+        run: python agent/run.py
+      - name: Publish the ledger
+        run: |
+          git config user.name "agent100"
+          git config user.email "agent100@users.noreply.github.com"
+          git add data/state.json
+          git diff --cached --quiet && exit 0
+          git commit -m "ledger: $(date -u +%FT%TZ)"
+          git pull --rebase
+          git push
