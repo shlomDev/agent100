@@ -6,7 +6,7 @@ charged from real token usage at INFER_IN / INFER_OUT per million tokens.
 Buyers are simulated (tagged sim) until real ones exist.
 
 Runs on GitHub Actions; needs only the Python standard library.
-Optional secret: ANTHROPIC_API_KEY (enables the writing step).
+Inference is free by default (GitHub Models). Optional: INFER_PROVIDER=anthropic + ANTHROPIC_API_KEY.
 """
 import json, os, random, time, urllib.request, urllib.parse
 from datetime import datetime, timezone, timedelta
@@ -15,6 +15,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 STATE = os.path.join(ROOT, "data", "state.json")
 START = 100.0
 MODEL = os.environ.get("AGENT_MODEL", "claude-haiku-5-5")
+GH_MODEL = os.environ.get("GH_MODEL") or "openai/gpt-4o-mini"
 # Estimated per-call prices, in USD, for comparable x402 services.
 PRICES = {"Hacker News search": 0.005, "GitHub search": 0.002, "Price feed": 0.001}
 # Inference rates in USD per million tokens. Set these to your model's real pricing.
@@ -71,7 +72,7 @@ class Job:
             self.useful = True
         else:
             self.w["wasted"] += 1
-        self._book({"t": now(), "kind": "call", "service": service, "method": "POST" if "messages" in endpoint else "GET",
+        self._book({"t": now(), "kind": "call", "service": service, "method": "POST" if "inference" in endpoint or "messages" in endpoint else "GET",
                     "endpoint": endpoint, "cost": c, "price": price, "ok": useful,
                     "result": summary[:240], "url": url}, -c)
         return summary
@@ -138,20 +139,41 @@ def prices():
 
 
 def write(prompt):
-    url = "https://api.anthropic.com/v1/messages"
+    """Inference. Default: GitHub Models (free inside GitHub Actions via GITHUB_TOKEN).
+    Set INFER_PROVIDER=anthropic and an ANTHROPIC_API_KEY secret to use Claude instead (paid)."""
+    if os.environ.get("INFER_PROVIDER", "github") == "anthropic":
+        url = "https://api.anthropic.com/v1/messages"
+        def fn():
+            key = os.environ.get("ANTHROPIC_API_KEY")
+            if not key:
+                raise RuntimeError("no ANTHROPIC_API_KEY secret set")
+            body = json.dumps({"model": MODEL, "max_tokens": 500,
+                               "messages": [{"role": "user", "content": prompt}]}).encode()
+            r = get_json(url, {"x-api-key": key, "anthropic-version": "2023-06-01",
+                               "content-type": "application/json"}, data=body)
+            text = "".join(b.get("text", "") for b in r["content"]).strip()
+            u = r["usage"]
+            return text, None, bool(text), paper_cost(u["input_tokens"], u["output_tokens"])
+        return url, fn
+
+    url = "https://models.github.ai/inference/chat/completions"
     def fn():
-        key = os.environ.get("ANTHROPIC_API_KEY")
-        if not key:
-            raise RuntimeError("no ANTHROPIC_API_KEY secret set")
-        body = json.dumps({"model": MODEL, "max_tokens": 500,
+        token = os.environ.get("GITHUB_TOKEN")
+        if not token:
+            raise RuntimeError("no GITHUB_TOKEN (runs only inside GitHub Actions)")
+        body = json.dumps({"model": GH_MODEL, "max_tokens": 500,
                            "messages": [{"role": "user", "content": prompt}]}).encode()
-        r = get_json(url, {"x-api-key": key, "anthropic-version": "2023-06-01",
-                           "content-type": "application/json"}, data=body)
-        text = "".join(b.get("text", "") for b in r["content"]).strip()
-        u = r["usage"]
-        cost = round(u["input_tokens"] / 1e6 * INFER_IN + u["output_tokens"] / 1e6 * INFER_OUT, 6)
-        return text, None, bool(text), cost
+        r = get_json(url, {"Authorization": "Bearer " + token, "Content-Type": "application/json",
+                           "Accept": "application/vnd.github+json"}, data=body)
+        text = (r["choices"][0]["message"]["content"] or "").strip()
+        u = r.get("usage") or {}
+        return text, None, bool(text), paper_cost(u.get("prompt_tokens", 0), u.get("completion_tokens", 0))
     return url, fn
+
+
+def paper_cost(tokens_in, tokens_out):
+    # Free for us, but the paper wallet is charged as if it bought these tokens.
+    return round(tokens_in / 1e6 * INFER_IN + tokens_out / 1e6 * INFER_OUT, 6)
 
 
 # ---- jobs --------------------------------------------------------------------
@@ -163,9 +185,9 @@ def job_news(state):
     repos = j.call("GitHub search", *gh("x402"))
     j.think("Writing a five-line digest from what came back.")
     raw = f"Stories: {stories}\nRepos: {repos}"
-    out = j.call("Inference", "api.anthropic.com/v1/messages", *write(
+    out = j.call("Inference", *write(
         "Write a 5-line plain-text digest for builders about AI-agent payments, using only these facts. "
-        "No hype, no invented facts. If there is little news, say so.\n\n" + raw)[1:], price="est.")
+        "No hype, no invented facts. If there is little news, say so.\n\n" + raw))
     j.sell("Daily digest", 0.05, "{n} subscribers paid ${p:.2f} each.")
     j.finish(out or raw)
 
@@ -175,9 +197,9 @@ def job_market(state):
     j.think("Pulling live prices: BTC, ETH, SOL, and USDC's peg.")
     px = j.call("Price feed", *prices())
     j.think("Turning the numbers into a two-line note.")
-    out = j.call("Inference", "api.anthropic.com/v1/messages", *write(
+    out = j.call("Inference", *write(
         "In two plain sentences, summarize these prices for an AI agent that holds USDC. "
-        "Mention whether USDC is on its peg. No advice.\n\n" + str(px))[1:])
+        "Mention whether USDC is on its peg. No advice.\n\n" + str(px)))
     j.sell("Market note", 0.02, "{n} agents bought the note at ${p:.2f}.")
     j.finish(out or px or "")
 
@@ -190,9 +212,9 @@ def job_builders(state):
     c = j.call("Hacker News search", *hn("\"MCP\" paid OR payments", hours=72))
     j.think("Ranking what looks real versus what looks like a token wrapper.")
     raw = f"MCP payments repos: {a}\nAgent wallet repos: {b}\nHN: {c}"
-    out = j.call("Inference", "api.anthropic.com/v1/messages", *write(
+    out = j.call("Inference", *write(
         "From these lists, name up to 4 projects worth watching and one line each on why. "
-        "Plain text, skeptical tone, only what the data supports.\n\n" + raw)[1:])
+        "Plain text, skeptical tone, only what the data supports.\n\n" + raw))
     j.sell("Builders watchlist", 0.10, "{n} readers paid ${p:.2f}.")
     j.finish(out or raw)
 

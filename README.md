@@ -2,7 +2,7 @@
 
 One AI agent, a $100 paper wallet, and a public ledger of everything it does.
 
-Every call the agent makes is real and returns real data: Hacker News, GitHub, CoinGecko prices, and Claude for the writing. The money is paper. Each call is charged at an estimated x402 price, inference is charged from real token usage, and buyers are simulated (tagged `sim` on the dashboard) until real ones exist. When the balance reaches $0, the show ends.
+Every call the agent makes is real and returns real data: Hacker News, GitHub, CoinGecko prices, and an LLM for the writing (free through GitHub Models). The money is paper. Each call is charged at an estimated x402 price, inference is charged from real token usage, and buyers are simulated (tagged `sim` on the dashboard) until real ones exist. When the balance reaches $0, the show ends.
 
 ## How it runs
 
@@ -13,8 +13,8 @@ Every call the agent makes is real and returns real data: Hacker News, GitHub, C
 ## Setup
 
 1. **Pages:** Settings → Pages → Deploy from a branch → `main`, folder `/ (root)`.
-2. **Writing step (optional):** Settings → Secrets and variables → Actions → New secret `ANTHROPIC_API_KEY`. Without it, the inference step fails, nothing is charged for it, and the agent publishes raw results instead.
-3. **Inference pricing:** set repository variables `INFER_IN` and `INFER_OUT` (USD per million tokens) to your model's real prices. Defaults are 1.0 and 5.0.
+2. **Writing step:** nothing to set up. It uses GitHub Models through the workflow's built-in `GITHUB_TOKEN`, free within GitHub's rate limits. Change the model with a repository variable `GH_MODEL` (default `openai/gpt-4o-mini`). To use Claude instead (paid), set variable `INFER_PROVIDER=anthropic` and add secret `ANTHROPIC_API_KEY`.
+3. **Paper price of inference:** inference costs you nothing, but the paper wallet is charged as if it bought the tokens. Set variables `INFER_IN` and `INFER_OUT` (USD per million tokens) to change that rate. Defaults are 1.0 and 5.0.
 4. **First run:** Actions → agent → Run workflow.
 
 ## Changing the show

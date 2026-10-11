@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  models: read      # free inference through GitHub Models
 
 concurrency:
   group: agent
@@ -22,6 +23,8 @@ jobs:
           python-version: "3.12"
       - name: Do one job
         env:
+          INFER_PROVIDER: ${{ vars.INFER_PROVIDER }}
+          GH_MODEL: ${{ vars.GH_MODEL }}
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           INFER_IN: ${{ vars.INFER_IN }}
