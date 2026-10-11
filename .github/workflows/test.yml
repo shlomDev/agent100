@@ -1,0 +1,25 @@
+name: test
+
+on:
+  push:
+    branches: [main]
+    paths: ['verified-il/**']
+  pull_request:
+    paths: ['verified-il/**']
+
+permissions:
+  contents: read
+
+jobs:
+  verified-il:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    defaults:
+      run:
+        working-directory: verified-il
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm test

@@ -22,3 +22,8 @@ Every call the agent makes is real and returns real data: Hacker News, GitHub, C
 - Per-call prices: `PRICES` in `agent/run.py`.
 - Jobs: add a function to `JOBS`. Each job calls `j.think()`, `j.call()`, `j.sell()` and `j.finish()`.
 - Reset the wallet: delete `data/state.json` and run the workflow.
+
+## Also in this repo
+
+- **[`template/`](template/)**: reusable live-dashboard template (one script, one stylesheet, a JSON config). Presets: trading desk, this agent's ledger, Zuzei's live counter. Demo: `/template/` on this site.
+- **[`verified-il/`](verified-il/)**: *Verified IL*, Israeli consumer rules for AI agents as signed facts, calculations and checks, sold per call over x402 (payments off by default). Design and business case: [`verified-il/docs/VERIFIED-IL.md`](verified-il/docs/VERIFIED-IL.md).
