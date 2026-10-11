@@ -1,0 +1,5 @@
+# Not part of the site
+*.md
+test/
+.env*
+verified-il/

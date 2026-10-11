@@ -1,0 +1,10 @@
+{
+  "name": "agent100",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Agent 100 — specific AI agents for Israelis",
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "scripts": { "test": "node --test" },
+  "dependencies": { "@anthropic-ai/sdk": "^0.129.0" }
+}

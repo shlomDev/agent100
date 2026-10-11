@@ -1,0 +1,67 @@
+{
+  "dataset": "verified-il",
+  "version": "0.1.0",
+  "note": "Rules start as drafts copied from Zuzei (shlomDev/zuzei api/_rules.js). A rule counts as verified only when `reviewed` names a reviewer and a date. Unreviewed rules are served with verified:false and are never sold as verified.",
+  "rules": [
+    {
+      "id": "il.consumer.cancel.store.14d",
+      "topic": "consumer/cancellation",
+      "title": { "he": "ביטול עסקה בבית העסק", "en": "Cancelling an in-store purchase" },
+      "answer": {
+        "he": "עסקה שנעשתה בבית העסק ניתנת לביטול בתוך 14 ימים מיום הרכישה, לגבי טובין שמחירם עולה על 50 ₪ ובתנאי שלא נעשה בהם שימוש. זכות הביטול אינה חלה, בין היתר, על מזון, תרופות, טובין פסידים, טובין שיוצרו או הותאמו במיוחד לצרכן, והלבשה תחתונה. דמי ביטול, אם נגבים, לא יעלו על 5% ממחיר העסקה או 100 ₪, לפי הנמוך.",
+        "en": "An in-store purchase of goods over ₪50 can be cancelled within 14 days of purchase if unused. Exceptions include food, medicine, perishables, custom-made goods and underwear. A cancellation fee, if charged, may not exceed 5% of the price or ₪100, whichever is lower."
+      },
+      "law": "חוק הגנת הצרכן, התשמ\"א-1981, והתקנות שהותקנו מכוחו",
+      "params": { "days": 14, "minPriceIls": 50, "feePct": 5, "feeCapIls": 100 },
+      "reviewed": null
+    },
+    {
+      "id": "il.consumer.cancel.distance.14d",
+      "topic": "consumer/cancellation",
+      "title": { "he": "ביטול עסקת מכר מרחוק (אינטרנט / טלפון)", "en": "Cancelling an online or phone purchase" },
+      "answer": {
+        "he": "לפי סעיף 14ג לחוק הגנת הצרכן, הצרכן רשאי לבטל עסקת מכר מרחוק בתוך 14 ימים מיום קבלת הטובין. לאחר ביטול כדין, על העוסק להשיב את התמורה בתוך 14 ימים מקבלת הודעת הביטול. דמי ביטול לא יעלו על 5% או 100 ₪, לפי הנמוך.",
+        "en": "Under §14C of the Consumer Protection Law, a distance purchase can be cancelled within 14 days of receiving the goods. The business must refund within 14 days of the cancellation notice. Fees are capped at 5% or ₪100, whichever is lower."
+      },
+      "law": "חוק הגנת הצרכן, התשמ\"א-1981, סעיף 14ג",
+      "params": { "days": 14, "refundDays": 14, "feePct": 5, "feeCapIls": 100 },
+      "reviewed": null
+    },
+    {
+      "id": "il.consumer.continuous.cancel",
+      "topic": "consumer/subscriptions",
+      "title": { "he": "ביטול עסקה מתמשכת (מנוי)", "en": "Cancelling a subscription" },
+      "answer": {
+        "he": "לפי סעיף 13ד לחוק הגנת הצרכן, הצרכן רשאי לבטל עסקה מתמשכת בכל עת, באותה דרך שבה נעשתה ההתקשרות. העוסק חייב להפסיק את החיוב בתוך 3 ימי עסקים ממסירת הודעת הביטול.",
+        "en": "Under §13D, a continuous transaction can be cancelled at any time, through the same channel used to sign up. Billing must stop within 3 business days of the notice."
+      },
+      "law": "חוק הגנת הצרכן, התשמ\"א-1981, סעיף 13ד",
+      "params": { "businessDays": 3 },
+      "reviewed": null
+    },
+    {
+      "id": "il.rental.deposit.60d",
+      "topic": "rental/deposit",
+      "title": { "he": "החזרת פיקדון שכירות", "en": "Return of a rental deposit" },
+      "answer": {
+        "he": "בשכירות דירה למגורים ליותר משלושה חודשים, בשכר דירה של עד 20,000 ₪ לחודש, המשכיר חייב להשיב את הביטחון בתוך 60 ימים מהחזרת הדירה או מסילוק החובות, לפי המאוחר, בתוספת רווח שנצבר עליו, ככל שנצבר.",
+        "en": "For residential leases over 3 months with rent up to ₪20,000/month, the landlord must return the security within 60 days of the apartment's return or the settling of debts, whichever is later, with any accrued gains."
+      },
+      "law": "חוק השכירות והשאילה, התשל\"א-1971 (תיקון שכירות הוגנת)",
+      "params": { "days": 60, "maxRentIls": 20000, "minMonths": 3 },
+      "reviewed": null
+    },
+    {
+      "id": "il.comm.spam.30a",
+      "topic": "communications/spam",
+      "title": { "he": "פרסומת בלי הסכמה (חוק הספאם)", "en": "Advertising without consent (spam law)" },
+      "answer": {
+        "he": "סעיף 30א לחוק התקשורת (בזק ושידורים), התשמ\"ב-1982, אוסר לשגר דבר פרסומת במסרון או בדואר אלקטרוני בלי הסכמה מפורשת מראש של הנמען. דבר פרסומת צריך לכלול את המילה \"פרסומת\" בתחילתו, את פרטי המפרסם ואת זכות הנמען לסרב. בית המשפט רשאי לפסוק פיצוי שאינו תלוי בנזק, עד 1,000 ₪ לכל הודעה.",
+        "en": "§30A of the Communications Law bans sending ads by SMS or email without the recipient's prior explicit consent. Ads must start with the word \"פרסומת\", name the advertiser and offer a way to refuse. Courts may award up to ₪1,000 per message without proof of damage."
+      },
+      "law": "חוק התקשורת (בזק ושידורים), התשמ\"ב-1982, סעיף 30א",
+      "params": { "perMessageCapIls": 1000 },
+      "reviewed": null
+    }
+  ]
+}

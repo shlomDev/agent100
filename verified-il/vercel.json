@@ -1,0 +1,6 @@
+{
+  "rewrites": [
+    { "source": "/v1/:tool", "destination": "/api/v1?tool=:tool" },
+    { "source": "/", "destination": "/api/v1?tool=catalog" }
+  ]
+}

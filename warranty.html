@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>קבלה ← אחריות · Agent 100</title>
+<meta name="description" content="סוכן 23: מצלמים את הקבלה כשקונים, ומקבלים תזכורת חודש לפני שהאחריות נגמרת. כשמשהו מתקלקל, יודעים אם עוד יש אחריות.">
+<meta name="theme-color" content="#F2F3EE">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Karantina:wght@400;700&family=Rubik:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/app.css">
+</head>
+<body data-agent="receipt">
+<div class="wrap narrow">
+  <header class="top">
+    <a class="brand" href="/" dir="ltr">Agent<b>100</b></a>
+    <nav><a href="/">כל הסוכנים</a></nav>
+  </header>
+
+  <main>
+    <div class="agent-head">
+      <span class="num">23</span>
+      <h1>קבלה ← אחריות</h1>
+      <p>מצלמים את הקבלה כשקונים, ומקבלים תזכורת חודש לפני שהאחריות נגמרת. כשמשהו מתקלקל, יודעים אם עוד יש אחריות.</p>
+    </div>
+
+    <section class="panel" aria-labelledby="s1">
+      <h2 id="s1">מה קיבלתם?</h2>
+      <label class="drop" id="drop" for="file">
+        <strong>צילום של הקבלה</strong>
+        <span class="note">צילום מסך או צילום רגיל.</span>
+      </label>
+      <input type="file" id="file" accept="image/*" class="sr-only">
+      <div class="thumbs" id="thumb"></div>
+      <div class="field gap">
+        <label for="text">או הדביקו את פרטי הקבלה <span class="hint">(במקום צילום, או בנוסף)</span></label>
+        <textarea id="text" maxlength="4000" placeholder="למשל: מכונת כביסה, מחסני חשמל, 2,490 ש&quot;ח, 3.10.2026, אחריות 3 שנים"></textarea>
+      </div>
+      <div class="row"><button class="btn" type="button" id="go">קראו</button></div>
+      <p class="status" id="status" role="status" aria-live="polite"></p>
+      <p class="error" id="error" role="alert"></p>
+    </section>
+
+    <section class="panel" id="results" hidden aria-labelledby="s2">
+      <h2 id="s2">מה מצאנו</h2>
+      <p class="note">בדקו ותקנו אם צריך.</p>
+      <div class="queue" id="found"></div>
+      <div class="row gap" id="actions">
+        <button class="btn" type="button" id="cal">הוספה ליומן</button>
+        <button class="btn ghost" type="button" id="save">שמירה ברשימה בטלפון</button>
+      </div>
+      <p class="status" id="act-status" role="status" aria-live="polite"></p>
+    </section>
+
+    <section class="panel" id="saved" hidden aria-labelledby="s3">
+      <h2 id="s3">הרשימה שלכם</h2>
+      <div id="saved-list"></div>
+      <p class="note">נשמר בטלפון הזה בלבד.</p>
+    </section>
+  </main>
+
+  <footer>
+    <p>התמונה או ההודעה נשלחות לקריאה ולא נשמרות אצלנו. אנחנו לא קוראים מספרי תעודת זהות, כרטיס אשראי או חשבון בנק.</p>
+    <p><a href="/privacy">מדיניות פרטיות</a> · <a href="/">כל הסוכנים</a></p>
+  </footer>
+</div>
+<script type="module" src="/assets/agents-daily.js"></script>
+</body>
+</html>
