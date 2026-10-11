@@ -1,0 +1,23 @@
+{
+  "title": "Trading desk",
+  "subtitle": "orders, positions and P&L, live",
+  "currency": "$",
+  "source": { "demo": "trading" },
+  "widgets": [
+    { "type": "ticker", "items": "prices", "label": "symbol", "value": "price", "change": "chg" },
+    { "type": "hero", "size": "two-thirds", "label": "Account equity", "value": "equity", "format": "money",
+      "chips": [ { "value": "pnl", "format": "signed", "tone": "auto", "suffix": " P&L" }, { "value": "pnlPct", "format": "pct", "suffix": " today" } ],
+      "series": "history", "baseline": "start" },
+    { "type": "ranking", "size": "third", "title": "Open positions", "items": "positions", "label": "symbol", "value": "value", "format": "money0" },
+    { "type": "kpis", "items": [
+      { "label": "Orders", "value": "kpis.orders", "format": "int" },
+      { "label": "Filled", "value": "kpis.filled", "format": "int" },
+      { "label": "Rejected", "value": "kpis.rejected", "format": "int" },
+      { "label": "Win rate", "value": "kpis.winRate", "format": "percent" },
+      { "label": "Exposure", "value": "kpis.exposure", "format": "money0" } ] },
+    { "type": "feed", "size": "two-thirds", "title": "Orders · newest first", "items": "orders",
+      "fields": { "time": "t", "title": "symbol", "tag": "side", "sub": "note", "amount": "amount" },
+      "tones": { "BUY": "a", "SELL": "g", "REJECTED": "l" } },
+    { "type": "feed", "size": "third", "title": "News", "items": "news", "fields": { "time": "t", "title": "title", "sub": "src" }, "amountFormat": "int" }
+  ]
+}

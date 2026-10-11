@@ -1,0 +1,23 @@
+{
+  "title": "זוזיי בזמן אמת",
+  "subtitle": "כמה כסף צרכנים דורשים בחזרה",
+  "dir": "rtl",
+  "lang": "he",
+  "currency": "₪",
+  "currencyAfter": true,
+  "liveText": "חי",
+  "idleText": "שקט",
+  "updatedText": "עודכן לפני",
+  "banner": "נתונים אנונימיים בלבד: ספירות וסכומים מעוגלים. שום פרט אישי.",
+  "source": { "url": "/api/live", "every": 60 },
+  "widgets": [
+    { "type": "kpis", "items": [
+      { "label": "מכתבים", "value": "totals.letters", "format": "int" },
+      { "label": "₪ שנדרשו", "value": "totals.ils_demanded", "format": "money0" },
+      { "label": "₪ שהתקבלו (מדווח)", "value": "totals.ils_recovered", "format": "money0" },
+      { "label": "שולם", "value": "totals.status:paid", "format": "int" } ] },
+    { "type": "line", "size": "two-thirds", "title": "מכתבים ביום", "series": "days", "y": [ { "path": "letters", "label": "מכתבים" } ] },
+    { "type": "ranking", "size": "third", "title": "לפי סוג פנייה", "from": "totals", "prefix": "cat:", "format": "int",
+      "labels": { "store": "החזרה בחנות", "online": "קנייה באינטרנט", "defect": "מוצר פגום", "subscription": "מנוי", "deposit": "פיקדון", "spam": "ספאם", "other": "אחר" } }
+  ]
+}

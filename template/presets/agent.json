@@ -1,0 +1,22 @@
+{
+  "title": "Agent $100",
+  "subtitle": "one AI agent, real jobs, a $100 paper wallet",
+  "currency": "$",
+  "banner": "Paper money, real work: every call really happened; the wallet is a $100 paper account and buyers are simulated (sim).",
+  "source": { "url": "../data/state.json", "every": 30, "updatedAt": "wallet.updatedAt", "idleAfter": 1800 },
+  "widgets": [
+    { "type": "hero", "size": "two-thirds", "label": "Paper wallet · USDC", "value": "wallet.balance", "format": "money", "splitDecimals": true,
+      "chips": [ { "value": "wallet.spent", "format": "money", "prefix": "spent " }, { "value": "wallet.earned", "format": "money", "prefix": "earned " } ],
+      "series": "wallet.history", "baseline": "wallet.start" },
+    { "type": "card", "size": "third", "label": "Current job", "title": "wallet.currentJob.title", "note": "wallet.currentJob.thought", "steps": "wallet.currentJob.steps", "emptyTitle": "No job yet" },
+    { "type": "kpis", "items": [
+      { "label": "Paid calls", "value": "wallet.calls", "format": "int" },
+      { "label": "Spent", "value": "wallet.spent", "format": "money" },
+      { "label": "Earned", "value": "wallet.earned", "format": "money" },
+      { "label": "Wasted calls", "value": "wallet.wasted", "format": "int" },
+      { "label": "Jobs done", "value": "wallet.jobsDone", "format": "int" } ] },
+    { "type": "feed", "title": "Ledger · every request", "items": "jobs[].events[]", "sortBy": "t",
+      "fields": { "time": "t", "title": "service", "tag": "price", "sub": "result", "amount": "amount", "minus": "cost", "link": "url" },
+      "tones": { "list": "a" }, "amountFormat": "money4", "empty": "No calls yet." }
+  ]
+}
