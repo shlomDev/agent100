@@ -12,7 +12,13 @@ The site is a board of 100 numbered "queue tickets" (מספר בתור): live ag
 | 24 | **מחברת המעטפות**: photos of the handwritten gift notebook → table of who gave how much | `/notebook` |
 | 25 | **הזמנה ← כמה הם נתנו**: invitation screenshot → "they gave you ₪X" → calendar | `/invite` |
 
+| 26 | **Verified IL** (כללים מאומתים לבוטים): the same Israeli rules as a signed API for other bots and AI agents, billable per call over x402 (off) | [`verified-il/`](verified-il/), deployed separately |
+
 Coming soon (#7–#23): flight delay compensation, bank fees, price hikes, parking appeals, SMS bill reminders, forms from a photo, and more. The list lives in `assets/catalog.js`.
+
+## One rules core, two doors
+
+The Israeli rules (cancellation periods, spam law, deposits…) are the core of Agent 100. **People** use them through the agents on the site; **other software** uses them through Verified IL (`verified-il/`): facts, calculations and checks, each response Ed25519-signed, with an x402 payment layer that stays off until you set a wallet. Rules are served as `verified: false` until a lawyer signs off. Its own README has the deploy steps (a second Vercel project with Root Directory `verified-il`).
 
 ## How #24 reads handwriting
 

@@ -1,0 +1,9 @@
+{
+  "name": "verified-il",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Israeli consumer rules as signed facts, calculations and checks for AI agents, sold per call over x402",
+  "type": "module",
+  "engines": { "node": ">=20" },
+  "scripts": { "test": "node --test" }
+}

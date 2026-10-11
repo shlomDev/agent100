@@ -34,5 +34,6 @@ export const AGENTS = [
   { n: 22, name: 'התאמת מכרזים', sub: 'מכרזים חדשים שמתאימים לעסק', cat: 'biz', status: 'soon' },
   { n: 23, name: 'קבלה ← אחריות', sub: 'תזכורת לפני שהאחריות נגמרת', cat: 'time', status: 'live', href: '/warranty' },
   { n: 24, name: 'מחברת המעטפות', sub: 'מכתב יד לטבלה: מי נתן כמה', cat: 'docs', status: 'live', href: '/notebook' },
+  { n: 26, name: 'כללים מאומתים לבוטים', sub: 'API לסוכנים ולבוטים: עובדות, חישובים ובדיקות חתומים (Verified IL)', cat: 'biz', status: 'soon' },
   { n: 25, name: 'הזמנה ← כמה הם נתנו', sub: 'צילום הזמנה, והסכום שהם נתנו לכם', cat: 'docs', status: 'live', href: '/invite' },
 ];
