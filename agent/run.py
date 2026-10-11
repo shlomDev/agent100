@@ -6,7 +6,7 @@ charged from real token usage at INFER_IN / INFER_OUT per million tokens.
 Buyers are simulated (tagged sim) until real ones exist.
 
 Runs on GitHub Actions; needs only the Python standard library.
-Inference is free by default (GitHub Models). Optional: INFER_PROVIDER=anthropic + ANTHROPIC_API_KEY.
+Inference: free GitHub Models first, Claude (ANTHROPIC_API_KEY) only if the free tier fails.
 """
 import json, os, random, time, urllib.request, urllib.parse
 from datetime import datetime, timezone, timedelta
@@ -57,7 +57,10 @@ class Job:
         step = {"name": service, "amt": "", "status": "now"}
         self.steps.append(step)
         try:
-            summary, url, useful, real_cost = fn()
+            res = fn()
+            summary, url, useful, real_cost = res[:4]
+            if len(res) > 4:
+                endpoint = res[4].replace("https://", "")
         except Exception as e:  # a failed call is never paid for
             step.update(status="done", amt="failed")
             self.job["events"].append({"t": now(), "kind": "call", "service": service, "method": "GET",
@@ -139,36 +142,48 @@ def prices():
 
 
 def write(prompt):
-    """Inference. Default: GitHub Models (free inside GitHub Actions via GITHUB_TOKEN).
-    Set INFER_PROVIDER=anthropic and an ANTHROPIC_API_KEY secret to use Claude instead (paid)."""
-    if os.environ.get("INFER_PROVIDER", "github") == "anthropic":
-        url = "https://api.anthropic.com/v1/messages"
-        def fn():
-            key = os.environ.get("ANTHROPIC_API_KEY")
-            if not key:
-                raise RuntimeError("no ANTHROPIC_API_KEY secret set")
-            body = json.dumps({"model": MODEL, "max_tokens": 500,
-                               "messages": [{"role": "user", "content": prompt}]}).encode()
-            r = get_json(url, {"x-api-key": key, "anthropic-version": "2023-06-01",
-                               "content-type": "application/json"}, data=body)
-            text = "".join(b.get("text", "") for b in r["content"]).strip()
-            u = r["usage"]
-            return text, None, bool(text), paper_cost(u["input_tokens"], u["output_tokens"])
-        return url, fn
+    """Inference: free GitHub Models first. If that fails (rate limit or outage) and an
+    ANTHROPIC_API_KEY secret exists, fall back to Claude (paid credits).
+    INFER_PROVIDER=anthropic skips the free tier entirely."""
+    gh_url = "https://models.github.ai/inference/chat/completions"
+    an_url = "https://api.anthropic.com/v1/messages"
 
-    url = "https://models.github.ai/inference/chat/completions"
-    def fn():
+    def github():
         token = os.environ.get("GITHUB_TOKEN")
         if not token:
             raise RuntimeError("no GITHUB_TOKEN (runs only inside GitHub Actions)")
         body = json.dumps({"model": GH_MODEL, "max_tokens": 500,
                            "messages": [{"role": "user", "content": prompt}]}).encode()
-        r = get_json(url, {"Authorization": "Bearer " + token, "Content-Type": "application/json",
-                           "Accept": "application/vnd.github+json"}, data=body)
+        r = get_json(gh_url, {"Authorization": "Bearer " + token, "Content-Type": "application/json",
+                              "Accept": "application/vnd.github+json"}, data=body)
         text = (r["choices"][0]["message"]["content"] or "").strip()
         u = r.get("usage") or {}
-        return text, None, bool(text), paper_cost(u.get("prompt_tokens", 0), u.get("completion_tokens", 0))
-    return url, fn
+        return text, None, bool(text), paper_cost(u.get("prompt_tokens", 0), u.get("completion_tokens", 0)), gh_url
+
+    def anthropic():
+        key = os.environ.get("ANTHROPIC_API_KEY")
+        if not key:
+            raise RuntimeError("no ANTHROPIC_API_KEY secret set")
+        body = json.dumps({"model": MODEL, "max_tokens": 500,
+                           "messages": [{"role": "user", "content": prompt}]}).encode()
+        r = get_json(an_url, {"x-api-key": key, "anthropic-version": "2023-06-01",
+                              "content-type": "application/json"}, data=body)
+        text = "".join(b.get("text", "") for b in r["content"]).strip()
+        u = r["usage"]
+        return text, None, bool(text), paper_cost(u["input_tokens"], u["output_tokens"]), an_url
+
+    def fn():
+        if os.environ.get("INFER_PROVIDER") == "anthropic":
+            return anthropic()
+        try:
+            return github()
+        except Exception as e:
+            if not os.environ.get("ANTHROPIC_API_KEY"):
+                raise
+            print(f"GitHub Models failed ({e}); falling back to Claude")
+            return anthropic()
+
+    return gh_url, fn
 
 
 def paper_cost(tokens_in, tokens_out):

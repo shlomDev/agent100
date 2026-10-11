@@ -13,7 +13,7 @@ Every call the agent makes is real and returns real data: Hacker News, GitHub, C
 ## Setup
 
 1. **Pages:** Settings → Pages → Deploy from a branch → `main`, folder `/ (root)`.
-2. **Writing step:** nothing to set up. It uses GitHub Models through the workflow's built-in `GITHUB_TOKEN`, free within GitHub's rate limits. Change the model with a repository variable `GH_MODEL` (default `openai/gpt-4o-mini`). To use Claude instead (paid), set variable `INFER_PROVIDER=anthropic` and add secret `ANTHROPIC_API_KEY`.
+2. **Writing step:** nothing to set up. It uses GitHub Models through the workflow's built-in `GITHUB_TOKEN`, free within GitHub's rate limits. Change the model with a repository variable `GH_MODEL` (default `openai/gpt-4o-mini`). If secret `ANTHROPIC_API_KEY` exists, Claude (paid) is used only when the free call fails, for example at the rate limit. Set variable `INFER_PROVIDER=anthropic` to always use Claude.
 3. **Paper price of inference:** inference costs you nothing, but the paper wallet is charged as if it bought the tokens. Set variables `INFER_IN` and `INFER_OUT` (USD per million tokens) to change that rate. Defaults are 1.0 and 5.0.
 4. **First run:** Actions → agent → Run workflow.
 
